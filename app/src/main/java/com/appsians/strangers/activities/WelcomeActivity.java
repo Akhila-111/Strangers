@@ -20,10 +20,10 @@ public class WelcomeActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-        if(auth.getCurrentUser() !=null){
+        /*if(auth.getCurrentUser() !=null){
             goToNextActivity();
             finish();
-        }
+        }*/
 
         findViewById(R.id.getStarted).setOnClickListener(new View.OnClickListener() {
             @Override
