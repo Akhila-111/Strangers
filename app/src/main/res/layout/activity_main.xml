@@ -42,7 +42,7 @@
         android:paddingRight="10dp"
         android:paddingBottom="5dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView5"
-        app:layout_constraintEnd_toStartOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toStartOf="@+id/rewardlay"
         app:layout_constraintTop_toTopOf="@+id/imageView5">
 
         <TextView
@@ -63,7 +63,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/rewardlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -79,11 +79,12 @@
         app:layout_constraintTop_toTopOf="@+id/imageView5">
 
         <ImageView
-            android:id="@+id/chest"
+            android:id="@+id/rewardBtn"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_weight="1"
-            app:srcCompat="@drawable/ic_treasure" />
+            app:srcCompat="@drawable/ic_treasure"
+            tools:ignore="ImageContrastCheck" />
     </LinearLayout>
 
     <com.airbnb.lottie.LottieAnimationView

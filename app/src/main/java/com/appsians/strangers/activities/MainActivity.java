@@ -15,6 +15,9 @@ import com.appsians.strangers.R;
 import com.appsians.strangers.databinding.ActivityMainBinding;
 import com.appsians.strangers.models.User;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,12 +36,24 @@ public class MainActivity extends AppCompatActivity {
     String[] permissions = new String[] {Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO};
     private int requestCode = 1;
 
+    User user;
+   // KProgressHUD
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
+
+            }
+        });
+
 
         auth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = auth.getCurrentUser();
@@ -70,6 +85,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 /*if (isPermissionsGranted()) {*/
                     if (coins > 5) {
+
+                        coins = coins -5;
+
+                        database.getReference().child("profiles")
+                                .child(currentUser.getUid())
+                                .child("coins")
+                                .setValue(coins);
+
                         startActivity(new Intent(MainActivity.this, ConnectingActivity.class));
                     } else {
                         Toast.makeText(MainActivity.this, "Insufficient Coins", Toast.LENGTH_SHORT).show();
@@ -80,6 +103,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        binding.rewardBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this,RewardActivity.class));
+            }
+        });
+
+
     }
 
 /*

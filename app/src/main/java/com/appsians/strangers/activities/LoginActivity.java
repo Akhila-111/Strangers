@@ -40,10 +40,10 @@ public class LoginActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        if(mAuth.getCurrentUser() !=null)
+       /* if(mAuth.getCurrentUser() !=null)
         {
             goToNextActivity();
-        }
+        }*/
 
         database = FirebaseDatabase.getInstance();
 

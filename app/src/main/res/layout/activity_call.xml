@@ -9,7 +9,11 @@
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/endCall"
@@ -55,6 +59,7 @@
         app:layout_constraintVertical_bias="0.01999998">
 
         <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/profile"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:paddingLeft="5dp"
@@ -73,7 +78,7 @@
             android:paddingRight="5dp">
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -83,7 +88,7 @@
                 android:textColor="@color/white" />
 
             <TextView
-                android:id="@+id/textView9"
+                android:id="@+id/city"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_vertical"
@@ -95,9 +100,41 @@
 
     </LinearLayout>
 
+
     <androidx.constraintlayout.widget.Group
         android:id="@+id/controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="vidBtn" />
+
+    <ImageView
+        android:id="@+id/connectingimage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bg_blur" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/loadingAnimation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loading" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/loadingGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:constraint_referenced_ids="connectingimage,loadingAnimation" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

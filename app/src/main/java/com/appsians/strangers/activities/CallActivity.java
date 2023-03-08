@@ -3,6 +3,7 @@ package com.appsians.strangers.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telecom.Call;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 import com.appsians.strangers.R;
 import com.appsians.strangers.databinding.ActivityCallBinding;
 import com.appsians.strangers.models.InterfaceJava;
+import com.appsians.strangers.models.User;
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -55,10 +58,12 @@ public class CallActivity extends AppCompatActivity {
         String incoming = getIntent().getStringExtra("incoming");
         createdBy = getIntent().getStringExtra("createdBy");
 
-        friendsUsername = "";
+/*        friendsUsername = "";
 
         if(incoming.equalsIgnoreCase(friendsUsername))
-            friendsUsername = incoming;
+            friendsUsername = incoming;*/
+
+        friendsUsername = incoming;
 
         setupWebView();
 
@@ -66,7 +71,7 @@ public class CallActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 isAudio = !isAudio;
-                CallJavaScriptFunction("javascript:toogleAudio(\"" + isAudio + "\"");
+                CallJavaScriptFunction("javascript:toggleAudio(\"" + isAudio + "\"");
 
                 if(isAudio){
                     binding.micBtn.setImageResource(R.drawable.btn_unmute_normal);
@@ -80,14 +85,21 @@ public class CallActivity extends AppCompatActivity {
         binding.vidBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                isAudio = !isAudio;
-                CallJavaScriptFunction("javascript:toggleVideo(\"" + isAudio + "\")");
+                isVideo = !isVideo;
+                CallJavaScriptFunction("javascript:toggleVideo(\"" + isVideo + "\")");
 
-                if(isAudio){
-                    binding.micBtn.setImageResource(R.drawable.btn_video_normal);
+                if(isVideo){
+                    binding.vidBtn.setImageResource(R.drawable.btn_video_normal);
                 } else {
-                    binding.micBtn.setImageResource(R.drawable.btn_video_muted);
+                    binding.vidBtn.setImageResource(R.drawable.btn_video_muted);
                 }
+            }
+        });
+
+        binding.endCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
 
@@ -100,7 +112,10 @@ public class CallActivity extends AppCompatActivity {
             @Override
             public void onPermissionRequest(PermissionRequest request) {
                // super.onPermissionRequest(request);
-                request.grant(request.getResources());
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                    request.grant(request.getResources());
+                }
+
             }
         });
 
@@ -113,7 +128,7 @@ public class CallActivity extends AppCompatActivity {
 
         public void loadVideoCall(){
 
-        String filePath = "file:android_assets/call.html";
+        String filePath = "file:android_asset/call.html";
         binding.webView.loadUrl(filePath);
 
         binding.webView.setWebViewClient(new WebViewClient(){
@@ -135,15 +150,61 @@ public class CallActivity extends AppCompatActivity {
         CallJavaScriptFunction("javascript:init(\"" + uniqeId + "\")" );
 
         if(createdBy.equalsIgnoreCase(username)){
+            if(pageExit)
+                return;
             firebaseRef.child(username).child("connId").setValue(uniqeId);
             firebaseRef.child(username).child("isAvailable").setValue(true);
 
+            binding.loadingGroup.setVisibility(View.GONE);
             binding.controls.setVisibility(View.VISIBLE);
+
+            FirebaseDatabase.getInstance().getReference()
+                    .child("profiles")
+                    .child(friendsUsername)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            User user = snapshot.getValue(User.class);
+
+                            Glide.with(CallActivity.this).load(user.getProfile())
+                                    .into(binding.profile);
+                            binding.name.setText(user.getName());
+                            binding.city.setText(user.getCity());
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+
         } else{
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     friendsUsername = createdBy;
+
+                    FirebaseDatabase.getInstance().getReference()
+                            .child("profiles")
+                            .child(friendsUsername)
+                            .addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    User user = snapshot.getValue(User.class);
+
+                                    Glide.with(CallActivity.this).load(user.getProfile())
+                                            .into(binding.profile);
+                                    binding.name.setText(user.getName());
+                                    binding.city.setText(user.getCity());
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+
                     FirebaseDatabase.getInstance().getReference().child("users")
                             .child(friendsUsername)
                             .child("connId")
@@ -185,6 +246,8 @@ public class CallActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.getValue()==null)
                     return ;
+
+                binding.loadingGroup.setVisibility(View.GONE);
                 binding.controls.setVisibility(View.VISIBLE);
                 String connId = snapshot.getValue(String.class);
                 CallJavaScriptFunction("javascript:startCall(\"" + connId + "\")");
@@ -210,4 +273,11 @@ public class CallActivity extends AppCompatActivity {
         return UUID.randomUUID().toString();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        pageExit = true;
+        firebaseRef.child(createdBy).setValue(null);
+        finish();
+    }
 }
